@@ -1,0 +1,194 @@
+# ============================================================
+# 🧭 Aila Project Deployment Mapping
+# ------------------------------------------------------------
+# 本文件定义了 VSCode 仓库中各目录与宿主系统的映射关系。
+# 它被 deploy_to_nixos.sh / sync_container.sh 等脚本解析，
+# 用于自动同步、权限配置与容器映射。
+# ============================================================
+
+version: 0.2
+author: "Mason / 王萌"
+updated: "2025-10-15"
+
+mappings:
+  # ============================================================
+  # 🧱 宿主层（Host System）
+  # ------------------------------------------------------------
+  # 包含 NixOS 配置文件、硬件声明、日志路径映射
+  # ============================================================
+  - name: system-config
+    src: system/etc/nixos/
+    dst: /etc/nixos/
+    sudo: true
+    description: "系统配置声明与硬件模块（configuration.nix / hardware.nix）"
+
+  - name: system-logs
+    src: system/var/log/aila/
+    dst: /var/log/aila/
+    sudo: true
+    description: "宿主日志路径（同步用于离线调试）"
+
+  - name: system-opt
+    src: system/opt/aila/
+    dst: /opt/aila/
+    sudo: true
+    description: "系统级可执行组件与共享模块（AI接口 / 脚本）"
+
+  # ============================================================
+  # ⚙️ 服务层（Organs）
+  # ------------------------------------------------------------
+  # 各功能服务：Whisper、Ollama、Piper、Monitor
+  # ============================================================
+  - name: ollama-service
+    src: services/ollama/systemd/
+    dst: /etc/systemd/system/
+    sudo: true
+    description: "Ollama 推理服务（GPU 语言模型）"
+
+  - name: ollama-config
+    src: services/ollama/config/
+    dst: /etc/ollama/
+    sudo: true
+    description: "Ollama 模型配置与端口声明"
+
+  # ===========================================================
+  # 🎧 WHISPER 模块（语音识别 + 唤醒检测）
+  # ===========================================================
+  - name: whisper-service
+    src: services/whisper/systemd/
+    dst: /etc/systemd/system/
+    sudo: true
+    description: "Whisper 主监听守护进程（实时识别语音并触发回应）"
+
+  - name: whisper-config
+    src: services/whisper/config/
+    dst: /etc/whisper/
+    sudo: true
+    description: "Whisper 配置文件（模型路径、采样率、语言等参数）"
+
+  - name: whisper-scripts
+    src: services/whisper/scripts/
+    dst: /usr/local/bin/
+    sudo: true
+    description: "Whisper 辅助脚本（录音、文字转语音、接口调试）"
+
+  - name: whisper-main
+    src: services/whisper/main/
+    dst: /opt/aila/whisper/
+    sudo: true
+    description: "Whisper 主逻辑程序（唤醒检测 + 调用 Ollama + 调用 Piper 播放）"
+
+
+  - name: piper-service
+    src: services/piper/systemd/
+    dst: /etc/systemd/system/
+    sudo: true
+    description: "Piper 语音合成服务守护进程"
+
+  - name: piper-config
+    src: services/piper/config/
+    dst: /etc/piper/
+    sudo: true
+    description: "Piper 配置文件（模型路径 / 音量 / 语言）"
+
+  - name: piper-main
+    src: services/piper/main/
+    dst: /opt/aila/piper/
+    sudo: true
+    description: "Piper 主程序（TTS 接口与播放逻辑）"
+
+  - name: piper-scripts
+    src: services/piper/scripts/
+    dst: /usr/local/bin/
+    sudo: true
+    description: "Piper 辅助脚本（命令行播放文本）"
+    
+  - name: piper-install-script
+    src: services/piper/scripts/
+    dst: /usr/local/bin/
+    sudo: true
+    description: "Piper 模型自动下载与测试脚本（install_piper_model.sh）"
+
+
+  - name: monitor-service
+    src: services/monitor/systemd/
+    dst: /etc/systemd/system/
+    sudo: true
+    description: "监控模块（日志与容器心跳）"
+
+  - name: monitor-scripts
+    src: services/monitor/scripts/
+    dst: /opt/aila/monitor/
+    sudo: true
+    description: "监控脚本与自愈逻辑"
+
+  # ============================================================
+  # 🌌 精神层（Aila Core）
+  # ------------------------------------------------------------
+  # Aila 的核心意识与感知逻辑（容器内部 / 宿主镜像）
+  # ============================================================
+  - name: aila-core
+    src: aila/
+    dst: /opt/aila/
+    sudo: true
+    description: "Aila 精神核心：feel / mind / dream 模块"
+
+  - name: aila-models
+    src: aila/link/
+    dst: /opt/aila/link/
+    sudo: true
+    description: "Whisper / Llama 模型文件映射路径"
+
+  # ============================================================
+  # 🧠 神经层（Scripts）
+  # ------------------------------------------------------------
+  # 自动化控制逻辑：部署、同步、更新、日志分析
+  # ============================================================
+  - name: scripts
+    src: scripts/
+    dst: /usr/local/bin/
+    sudo: true
+    description: "部署与控制脚本（deploy / sync / update / launch）"
+
+  # ============================================================
+  # 🪶 部署声明层（Deploy）
+  # ------------------------------------------------------------
+  # 不会实际部署，只被脚本解析用于映射控制。
+  # ============================================================
+  - name: deploy-config
+    src: deploy/
+    dst: /opt/aila/deploy/
+    sudo: true
+    description: "部署规则声明目录（mapping.yaml / exclude / readme）"
+
+  # ============================================================
+  # 🧩 容器映射层（Containers）
+  # ------------------------------------------------------------
+  # 仅同步配置，不部署实际 rootfs。
+  # ============================================================
+  - name: containers
+    src: system/containers/
+    dst: /etc/nixos/containers/
+    sudo: true
+    description: "Aila / Reflector / WebServer 容器声明模块"
+
+# ============================================================
+# 🧩 排除规则引用（供 rsync 使用）
+# ------------------------------------------------------------
+# 可选：deploy/rsync-exclude.txt 定义具体排除文件
+# ============================================================
+exclude_file: deploy/rsync-exclude.txt
+
+# ============================================================
+# 🚀 同步策略参数（供 deploy_to_nixos.sh 调用）
+# ------------------------------------------------------------
+# - mode: mirror（完全镜像同步）
+# - dry_run: 是否模拟
+# - backup: 是否生成 .bak 副本
+# ============================================================
+sync_policy:
+  mode: mirror
+  dry_run: false
+  backup: true
+  preserve_permissions: true
+  show_progress: true

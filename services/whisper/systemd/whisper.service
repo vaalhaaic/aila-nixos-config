@@ -1,0 +1,13 @@
+[Unit]
+Description=Aila Whisper Listener (Speech + Wake Word + Response)
+After=network.target sound.target
+
+[Service]
+ExecStart=/run/current-system/sw/bin/bash -lc "cd /opt/aila/whisper && nix develop --command python3 whisper-listener.py"
+Restart=always
+RestartSec=5
+User=mason
+Environment="WHISPER_CONFIG=/etc/whisper/config.yaml"
+
+[Install]
+WantedBy=multi-user.target

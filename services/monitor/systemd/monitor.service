@@ -1,0 +1,9 @@
+[Unit]
+Description=Aila Monitor Service (placeholder)
+
+[Service]
+ExecStart=/opt/aila/scripts/monitor/check.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

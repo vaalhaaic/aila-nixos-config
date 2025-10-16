@@ -1,0 +1,13 @@
+[Unit]
+Description=Aila Piper Speech Synthesis Service
+After=sound.target
+
+[Service]
+ExecStart=/run/current-system/sw/bin/bash -lc "cd /opt/aila/piper && nix develop --command python3 main/piper-server.py"
+Restart=on-failure
+RestartSec=5
+User=mason
+Environment="PIPER_CONFIG=/etc/piper/config.yaml"
+
+[Install]
+WantedBy=multi-user.target

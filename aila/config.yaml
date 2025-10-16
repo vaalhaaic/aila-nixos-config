@@ -1,0 +1,5 @@
+# Aila 内部配置占位
+feel:
+  sense_threshold: 0.5
+mind:
+  reflection_interval: 60

@@ -1,0 +1,7 @@
+# Piper 语音合成配置
+model_path: /aila/models/piper-zh-xiaoyue.onnx
+output_device: default
+output_volume: 0.9
+sample_rate: 22050
+language: zh
+voice_name: "自然女声-小悦"

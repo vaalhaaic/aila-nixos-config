@@ -1,0 +1,6 @@
+model_path: /aila/models/whisper-small.bin
+output_dir: /aila/logs/transcripts
+language: zh
+sample_rate: 16000
+device: cuda   # 可选: cpu / cuda / auto
+voice_model: /aila/models/piper-zh-xiaoyue.onnx
